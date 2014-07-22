@@ -1,0 +1,1 @@
+path=%path%;c:\strawberry\c\bin;c:\strawberry\perl\site\bin;c:\strawberry\perl\bin;C:\Program Files\GnuWin32\bin

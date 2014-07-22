@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenPLC Ladder", "OpenPLC Ladder.vcxproj", "{C0AFE9E4-6360-780F-4F27-8A4716EA841F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0AFE9E4-6360-780F-4F27-8A4716EA841F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C0AFE9E4-6360-780F-4F27-8A4716EA841F}.Debug|Win32.Build.0 = Debug|Win32
+		{C0AFE9E4-6360-780F-4F27-8A4716EA841F}.Release|Win32.ActiveCfg = Release|Win32
+		{C0AFE9E4-6360-780F-4F27-8A4716EA841F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
