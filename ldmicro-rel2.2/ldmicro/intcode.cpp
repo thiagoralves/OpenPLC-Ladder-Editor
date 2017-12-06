@@ -45,8 +45,8 @@ static WORD EepromAddrFree;
 //-----------------------------------------------------------------------------
 void IntDumpListing(char *outFile)
 {
-    FILE *f = fopen(outFile, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, outFile, "w")==EINVAL) {
         Error("Couldn't dump intermediate code to '%s'.", outFile);
     }
 
@@ -57,120 +57,120 @@ void IntDumpListing(char *outFile)
         if(IntCode[i].op == INT_END_IF) indent--;
         if(IntCode[i].op == INT_ELSE) indent--;
     
-        fprintf(f, "%3d:", i);
+        fprintf_s(f, "%3d:", i);
         int j;
-        for(j = 0; j < indent; j++) fprintf(f, "    ");
+        for(j = 0; j < indent; j++) fprintf_s(f, "    ");
 
         switch(IntCode[i].op) {
             case INT_SET_BIT:
-                fprintf(f, "set bit '%s'", IntCode[i].name1);
+                fprintf_s(f, "set bit '%s'", IntCode[i].name1);
                 break;
 
             case INT_CLEAR_BIT:
-                fprintf(f, "clear bit '%s'", IntCode[i].name1);
+                fprintf_s(f, "clear bit '%s'", IntCode[i].name1);
                 break;
 
             case INT_COPY_BIT_TO_BIT:
-                fprintf(f, "let bit '%s' := '%s'", IntCode[i].name1,
+                fprintf_s(f, "let bit '%s' := '%s'", IntCode[i].name1,
                     IntCode[i].name2);
                 break;
 
             case INT_SET_VARIABLE_TO_LITERAL:
-                fprintf(f, "let var '%s' := %d", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := %d", IntCode[i].name1,
                     IntCode[i].literal);
                 break;
 
             case INT_SET_VARIABLE_TO_VARIABLE:
-                fprintf(f, "let var '%s' := '%s'", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := '%s'", IntCode[i].name1,
                     IntCode[i].name2);
                 break;
 
             case INT_SET_VARIABLE_ADD:
-                fprintf(f, "let var '%s' := '%s' + '%s'", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := '%s' + '%s'", IntCode[i].name1,
                     IntCode[i].name2, IntCode[i].name3);
                 break;
 
             case INT_SET_VARIABLE_SUBTRACT:
-                fprintf(f, "let var '%s' := '%s' - '%s'", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := '%s' - '%s'", IntCode[i].name1,
                     IntCode[i].name2, IntCode[i].name3);
                 break;
 
             case INT_SET_VARIABLE_MULTIPLY:
-                fprintf(f, "let var '%s' := '%s' * '%s'", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := '%s' * '%s'", IntCode[i].name1,
                     IntCode[i].name2, IntCode[i].name3);
                 break;
 
             case INT_SET_VARIABLE_DIVIDE:
-                fprintf(f, "let var '%s' := '%s' / '%s'", IntCode[i].name1,
+                fprintf_s(f, "let var '%s' := '%s' / '%s'", IntCode[i].name1,
                     IntCode[i].name2, IntCode[i].name3);
                 break;
 
             case INT_INCREMENT_VARIABLE:
-                fprintf(f, "increment '%s'", IntCode[i].name1);
+                fprintf_s(f, "increment '%s'", IntCode[i].name1);
                 break;
 
             case INT_READ_ADC:
-                fprintf(f, "read adc '%s'", IntCode[i].name1);
+                fprintf_s(f, "read adc '%s'", IntCode[i].name1);
                 break;
 
             case INT_SET_PWM:
-                fprintf(f, "set pwm '%s' %s Hz", IntCode[i].name1,
+                fprintf_s(f, "set pwm '%s' %s Hz", IntCode[i].name1,
                     IntCode[i].name2);
                 break;
 
             case INT_EEPROM_BUSY_CHECK:
-                fprintf(f, "set bit '%s' if EEPROM busy", IntCode[i].name1);
+                fprintf_s(f, "set bit '%s' if EEPROM busy", IntCode[i].name1);
                 break;
             
             case INT_EEPROM_READ:
-                fprintf(f, "read EEPROM[%d,%d+1] into '%s'",
+                fprintf_s(f, "read EEPROM[%d,%d+1] into '%s'",
                     IntCode[i].literal, IntCode[i].literal, IntCode[i].name1);
                 break;
 
             case INT_EEPROM_WRITE:
-                fprintf(f, "write '%s' into EEPROM[%d,%d+1]",
+                fprintf_s(f, "write '%s' into EEPROM[%d,%d+1]",
                     IntCode[i].name1, IntCode[i].literal, IntCode[i].literal);
                 break;
 
             case INT_UART_SEND:
-                fprintf(f, "uart send from '%s', done? into '%s'",
+                fprintf_s(f, "uart send from '%s', done? into '%s'",
                     IntCode[i].name1, IntCode[i].name2);
                 break;
 
             case INT_UART_RECV:
-                fprintf(f, "uart recv int '%s', have? into '%s'", 
+                fprintf_s(f, "uart recv int '%s', have? into '%s'", 
                     IntCode[i].name1, IntCode[i].name2);
                 break;
 
             case INT_IF_BIT_SET:
-                fprintf(f, "if '%s' {", IntCode[i].name1); indent++;
+                fprintf_s(f, "if '%s' {", IntCode[i].name1); indent++;
                 break;
 
             case INT_IF_BIT_CLEAR:
-                fprintf(f, "if not '%s' {", IntCode[i].name1); indent++;
+                fprintf_s(f, "if not '%s' {", IntCode[i].name1); indent++;
                 break;
 
             case INT_IF_VARIABLE_LES_LITERAL:
-                fprintf(f, "if '%s' < %d {", IntCode[i].name1,
+                fprintf_s(f, "if '%s' < %d {", IntCode[i].name1,
                     IntCode[i].literal); indent++;
                 break;
 
             case INT_IF_VARIABLE_EQUALS_VARIABLE:
-                fprintf(f, "if '%s' == '%s' {", IntCode[i].name1,
+                fprintf_s(f, "if '%s' == '%s' {", IntCode[i].name1,
                     IntCode[i].name2); indent++;
                 break;
 
             case INT_IF_VARIABLE_GRT_VARIABLE:
-                fprintf(f, "if '%s' > '%s' {", IntCode[i].name1,
+                fprintf_s(f, "if '%s' > '%s' {", IntCode[i].name1,
                     IntCode[i].name2); indent++;
                 break;
 
             case INT_END_IF:
-                fprintf(f, "}");
+                fprintf_s(f, "}");
                 break;
 
             case INT_ELSE:
-                fprintf(f, "} else {"); indent++;
+                fprintf_s(f, "} else {"); indent++;
                 break;
 
             case INT_SIMULATE_NODE_STATE:
@@ -178,13 +178,13 @@ void IntDumpListing(char *outFile)
                 break;
 
             case INT_COMMENT:
-                fprintf(f, "# %s", IntCode[i].name1);
+                fprintf_s(f, "# %s", IntCode[i].name1);
                 break;
 
             default:
                 oops();
         }
-        fprintf(f, "\n");
+        fprintf_s(f, "\n");
         fflush(f);
     }
     fclose(f);
@@ -212,22 +212,22 @@ int HexDigit(int c)
 //-----------------------------------------------------------------------------
 static void GenSymParThis(char *dest)
 {
-    sprintf(dest, "$parThis_%04x", GenSymCountParThis);
+    sprintf_s(dest, MAX_NAME_LEN, "$parThis_%04x", GenSymCountParThis);
     GenSymCountParThis++;
 }
 static void GenSymParOut(char *dest)
 {
-    sprintf(dest, "$parOut_%04x", GenSymCountParOut);
+    sprintf_s(dest, MAX_NAME_LEN, "$parOut_%04x", GenSymCountParOut);
     GenSymCountParOut++;
 }
 static void GenSymOneShot(char *dest)
 {
-    sprintf(dest, "$oneShot_%04x", GenSymCountOneShot);
+    sprintf_s(dest, MAX_NAME_LEN, "$oneShot_%04x", GenSymCountOneShot);
     GenSymCountOneShot++;
 }
 static void GenSymFormattedString(char *dest)
 {
-    sprintf(dest, "$formattedString_%04x", GenSymCountFormattedString);
+    sprintf_s(dest, MAX_NAME_LEN, "$formattedString_%04x", GenSymCountFormattedString);
     GenSymCountFormattedString++;
 }
 
@@ -237,9 +237,9 @@ static void GenSymFormattedString(char *dest)
 static void Op(int op, char *name1, char *name2, char *name3, SWORD lit)
 {
     IntCode[IntCodeLen].op = op;
-    if(name1) strcpy(IntCode[IntCodeLen].name1, name1);
-    if(name2) strcpy(IntCode[IntCodeLen].name2, name2);
-    if(name3) strcpy(IntCode[IntCodeLen].name3, name3);
+    if(name1) strcpy_s(IntCode[IntCodeLen].name1, MAX_NAME_LEN, name1);
+    if(name2) strcpy_s(IntCode[IntCodeLen].name2, MAX_NAME_LEN, name2);
+    if(name3) strcpy_s(IntCode[IntCodeLen].name3, MAX_NAME_LEN, name3);
     IntCode[IntCodeLen].literal = lit;
     IntCodeLen++;
 }
@@ -272,7 +272,7 @@ static void Op(int op)
 static void SimState(BOOL *b, char *name)
 {
     IntCode[IntCodeLen].op = INT_SIMULATE_NODE_STATE;
-    strcpy(IntCode[IntCodeLen].name1, name);
+    strcpy_s(IntCode[IntCodeLen].name1, MAX_NAME_LEN, name);
     IntCode[IntCodeLen].poweredAfter = b;
     IntCodeLen++;
 }
@@ -285,7 +285,7 @@ void Comment(char *str, ...)
     va_list f;
     char buf[MAX_NAME_LEN];
     va_start(f, str);
-    vsprintf(buf, str, f);
+    vsprintf_s(buf, MAX_NAME_LEN, str, f);
     Op(INT_COMMENT, buf);
 }
 
@@ -508,7 +508,7 @@ static void IntCodeFromCircuit(int which, void *any, char *stateInOut)
             // it finishes counting up. This does not seem to be what
             // people expect, so add a special case to fix that up.
             char antiGlitchName[MAX_NAME_LEN];
-            sprintf(antiGlitchName, "$%s_antiglitch", l->d.timer.name);
+            sprintf_s(antiGlitchName, MAX_NAME_LEN, "$%s_antiglitch", l->d.timer.name);
             Op(INT_IF_BIT_CLEAR, antiGlitchName);
                 Op(INT_SET_VARIABLE_TO_LITERAL, l->d.timer.name, period);
             Op(INT_END_IF);
@@ -678,7 +678,7 @@ static void IntCodeFromCircuit(int which, void *any, char *stateInOut)
                 Op(INT_IF_BIT_SET, stateInOut);
                 char line[80];
                 // ugh; need a >16 bit literal though, could be >64 kHz
-                sprintf(line, "%d", l->d.setPwm.targetFreq);
+                sprintf_s(line, 80, "%d", l->d.setPwm.targetFreq);
                 Op(INT_SET_PWM, l->d.readAdc.name, line);
                 Op(INT_END_IF);
                 break;
@@ -778,8 +778,8 @@ static void IntCodeFromCircuit(int which, void *any, char *stateInOut)
                     int i;
                     for(i = (l->d.shiftRegister.stages-2); i >= 0; i--) {
                         char dest[MAX_NAME_LEN+10], src[MAX_NAME_LEN+10];
-                        sprintf(src, "%s%d", l->d.shiftRegister.name, i);
-                        sprintf(dest, "%s%d", l->d.shiftRegister.name, i+1);
+                        sprintf_s(src, MAX_NAME_LEN+10, "%s%d", l->d.shiftRegister.name, i);
+                        sprintf_s(dest, MAX_NAME_LEN+10, "%s%d", l->d.shiftRegister.name, i+1);
                         Op(INT_SET_VARIABLE_TO_VARIABLE, dest, src);
                     }
                 Op(INT_END_IF);

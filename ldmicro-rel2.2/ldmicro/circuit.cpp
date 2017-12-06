@@ -231,7 +231,7 @@ void AddComment(char *str)
     if(!CanInsertComment) return;
 
     ElemLeaf *c = AllocLeaf();
-    strcpy(c->d.comment.str, str);
+    strcpy_s(c->d.comment.str, MAX_COMMENT_LEN, str);
 
     AddLeaf(ELEM_COMMENT, c);
 }
@@ -240,7 +240,7 @@ void AddContact(void)
     if(!CanInsertOther) return;
 
     ElemLeaf *c = AllocLeaf();
-    strcpy(c->d.contacts.name, "Xnew");
+    strcpy_s(c->d.contacts.name, MAX_NAME_LEN, "Xnew");
     c->d.contacts.negated = FALSE;
 
     AddLeaf(ELEM_CONTACTS, c);
@@ -250,7 +250,7 @@ void AddCoil(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *c = AllocLeaf();
-    strcpy(c->d.coil.name, "Ynew");
+    strcpy_s(c->d.coil.name, MAX_NAME_LEN, "Ynew");
     c->d.coil.negated = FALSE;
     c->d.coil.setOnly = FALSE;
     c->d.coil.resetOnly = FALSE;
@@ -262,7 +262,7 @@ void AddTimer(int which)
     if(!CanInsertOther) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.timer.name, "Tnew");
+    strcpy_s(t->d.timer.name, MAX_NAME_LEN, "Tnew");
     t->d.timer.delay = 100000;
 
     AddLeaf(which, t);
@@ -279,7 +279,7 @@ void AddReset(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.reset.name, "Tnew");
+    strcpy_s(t->d.reset.name, MAX_NAME_LEN, "Tnew");
     AddLeaf(ELEM_RES, t);
 }
 void AddMasterRelay(void)
@@ -294,7 +294,7 @@ void AddShiftRegister(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.shiftRegister.name, "reg");
+    strcpy_s(t->d.shiftRegister.name, MAX_NAME_LEN, "reg");
     t->d.shiftRegister.stages = 7;
     AddLeaf(ELEM_SHIFT_REGISTER, t);
 }
@@ -303,8 +303,8 @@ void AddFormattedString(void)
     if(!CanInsertOther) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.fmtdStr.var, "var");
-    strcpy(t->d.fmtdStr.string, "value: \\3\\r\\n");
+    strcpy_s(t->d.fmtdStr.var, MAX_NAME_LEN, "var");
+    strcpy_s(t->d.fmtdStr.string, 60, "value: \\3\\r\\n");
     AddLeaf(ELEM_FORMATTED_STRING, t);
 }
 void AddLookUpTable(void)
@@ -312,8 +312,8 @@ void AddLookUpTable(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.lookUpTable.dest, "dest");
-    strcpy(t->d.lookUpTable.index, "index");
+    strcpy_s(t->d.lookUpTable.dest, MAX_NAME_LEN, "dest");
+    strcpy_s(t->d.lookUpTable.index, MAX_NAME_LEN, "index");
     t->d.lookUpTable.count = 0;
     t->d.lookUpTable.editAsString = 0;
     AddLeaf(ELEM_LOOK_UP_TABLE, t);
@@ -323,8 +323,8 @@ void AddPiecewiseLinear(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.piecewiseLinear.dest, "yvar");
-    strcpy(t->d.piecewiseLinear.index, "xvar");
+    strcpy_s(t->d.piecewiseLinear.dest, MAX_NAME_LEN, "yvar");
+    strcpy_s(t->d.piecewiseLinear.index, MAX_NAME_LEN, "xvar");
     t->d.piecewiseLinear.count = 0;
     AddLeaf(ELEM_PIECEWISE_LINEAR, t);
 }
@@ -333,8 +333,8 @@ void AddMove(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.move.dest, "dest");
-    strcpy(t->d.move.src, "src");
+    strcpy_s(t->d.move.dest, MAX_NAME_LEN, "dest");
+    strcpy_s(t->d.move.src, MAX_NAME_LEN, "src");
     AddLeaf(ELEM_MOVE, t);
 }
 void AddMath(int which)
@@ -342,9 +342,9 @@ void AddMath(int which)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.math.dest, "dest");
-    strcpy(t->d.math.op1, "src");
-    strcpy(t->d.math.op2, "1");
+    strcpy_s(t->d.math.dest, MAX_NAME_LEN, "dest");
+    strcpy_s(t->d.math.op1, MAX_NAME_LEN, "src");
+    strcpy_s(t->d.math.op2, MAX_NAME_LEN, "1");
     AddLeaf(which, t);
 }
 void AddCmp(int which)
@@ -352,8 +352,8 @@ void AddCmp(int which)
     if(!CanInsertOther) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.cmp.op1, "var");
-    strcpy(t->d.cmp.op2, "1");
+    strcpy_s(t->d.cmp.op1, MAX_NAME_LEN, "var");
+    strcpy_s(t->d.cmp.op2, MAX_NAME_LEN, "1");
     AddLeaf(which, t);
 }
 void AddCounter(int which)
@@ -365,7 +365,7 @@ void AddCounter(int which)
     }
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.counter.name, "Cnew");
+    strcpy_s(t->d.counter.name, MAX_NAME_LEN, "Cnew");
     t->d.counter.max = 0;
     AddLeaf(which, t);
 }
@@ -374,7 +374,7 @@ void AddReadAdc(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.readAdc.name, "Anew");
+    strcpy_s(t->d.readAdc.name, MAX_NAME_LEN, "Anew");
     AddLeaf(ELEM_READ_ADC, t);
 }
 void AddSetPwm(void)
@@ -382,7 +382,7 @@ void AddSetPwm(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.setPwm.name, "duty_cycle");
+    strcpy_s(t->d.setPwm.name, MAX_NAME_LEN, "duty_cycle");
     t->d.setPwm.targetFreq = 1000;
     AddLeaf(ELEM_SET_PWM, t);
 }
@@ -391,7 +391,7 @@ void AddUart(int which)
     if(!CanInsertOther) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.uart.name, "char");
+    strcpy_s(t->d.uart.name, MAX_NAME_LEN, "char");
     AddLeaf(which, t);
 }
 void AddPersist(void)
@@ -399,7 +399,7 @@ void AddPersist(void)
     if(!CanInsertEnd) return;
 
     ElemLeaf *t = AllocLeaf();
-    strcpy(t->d.persist.var, "saved");
+    strcpy_s(t->d.persist.var, MAX_NAME_LEN, "saved");
     AddLeaf(ELEM_PERSIST, t);
 }
 

@@ -108,7 +108,7 @@ static int CountWidthOfElement(int which, void *elem, int soFar)
             ElemLeaf *l = (ElemLeaf *)elem;
             char tbuf[MAX_COMMENT_LEN];
 
-            strcpy(tbuf, l->d.comment.str);
+            strcpy_s(tbuf, MAX_COMMENT_LEN, l->d.comment.str);
             char *b = strchr(tbuf, '\n');
 
             int len;
@@ -418,7 +418,7 @@ static BOOL DrawEndOfLine(int which, ElemLeaf *leaf, int *cx, int *cy,
         case ELEM_CTC: {
             char buf[256];
             ElemCounter *c = &leaf->d.counter;
-            sprintf(buf, "{\x01""CTC\x02 0:%d}", c->max);
+            sprintf_s(buf, 256, "{\x01""CTC\x02 0:%d}", c->max);
 
             CenterWithSpaces(*cx, *cy, c->name, poweredAfter, TRUE);
             CenterWithWires(*cx, *cy, buf, poweredBefore, poweredAfter);
@@ -442,13 +442,13 @@ static BOOL DrawEndOfLine(int which, ElemLeaf *leaf, int *cx, int *cy,
             CenterWithSpaces(*cx, *cy, s->name, poweredAfter, TRUE);
             char l[50];
             if(s->targetFreq >= 100000) {
-                sprintf(l, "{PWM %d kHz}", (s->targetFreq+500)/1000);
+                sprintf_s(l, 50, "{PWM %d kHz}", (s->targetFreq+500)/1000);
             } else if(s->targetFreq >= 10000) {
-                sprintf(l, "{PWM %.1f kHz}", s->targetFreq/1000.0);
+                sprintf_s(l, 50, "{PWM %.1f kHz}", s->targetFreq/1000.0);
             } else if(s->targetFreq >= 1000) {
-                sprintf(l, "{PWM %.2f kHz}", s->targetFreq/1000.0);
+                sprintf_s(l, 50, "{PWM %.2f kHz}", s->targetFreq/1000.0);
             } else {
-                sprintf(l, "{PWM %d Hz}", s->targetFreq);
+                sprintf_s(l, 50, "{PWM %d Hz}", s->targetFreq);
             }
             CenterWithWires(*cx, *cy, l, poweredBefore,
                 poweredAfter);
@@ -472,12 +472,12 @@ static BOOL DrawEndOfLine(int which, ElemLeaf *leaf, int *cx, int *cy,
                 break;
             }
 
-            strcpy(top, "{            }");
+            strcpy_s(top, 256, "{            }");
             memcpy(top+1, m->dest, strlen(m->dest));
             top[strlen(m->dest) + 3] = ':';
             top[strlen(m->dest) + 4] = '=';
 
-            strcpy(bot, "{         \x01MOV\x02}");
+            strcpy_s(bot, 256, "{         \x01MOV\x02}");
             memcpy(bot+2, m->src, strlen(m->src));
 
             CenterWithSpaces(*cx, *cy, top, poweredAfter, FALSE);
@@ -493,7 +493,7 @@ static BOOL DrawEndOfLine(int which, ElemLeaf *leaf, int *cx, int *cy,
             char bot[MAX_NAME_LEN+20];
             memset(bot, ' ', sizeof(bot));
             bot[0] = '{';
-            sprintf(bot+2, "%s0..%d", leaf->d.shiftRegister.name,
+            sprintf_s(bot+2, MAX_NAME_LEN + 18, "%s0..%d", leaf->d.shiftRegister.name,
                 leaf->d.shiftRegister.stages-1);
             bot[strlen(bot)] = ' ';
             bot[13] = '}';
@@ -518,14 +518,14 @@ static BOOL DrawEndOfLine(int which, ElemLeaf *leaf, int *cx, int *cy,
             }
             memset(top, ' ', sizeof(top));
             top[0] = '{';
-            sprintf(top+2, "%s :=", dest);
+            sprintf_s(top+2, MAX_NAME_LEN+18, "%s :=", dest);
             top[strlen(top)] = ' ';
             top[13] = '}';
             top[14] = '\0';
             CenterWithSpaces(*cx, *cy, top, poweredAfter, FALSE);
             memset(bot, ' ', sizeof(bot));
             bot[0] = '{';
-            sprintf(bot+2, " %s[%s]", str, index);
+            sprintf_s(bot+2, MAX_NAME_LEN + 18, " %s[%s]", str, index);
             bot[strlen(bot)] = ' ';
             bot[13] = '}';
             bot[14] = '\0';
@@ -638,18 +638,18 @@ static BOOL DrawLeaf(int which, ElemLeaf *leaf, int *cx, int *cy,
             char tbuf[MAX_COMMENT_LEN];
             char tlbuf[MAX_COMMENT_LEN+8];
 
-            strcpy(tbuf, leaf->d.comment.str);
+            strcpy_s(tbuf, MAX_COMMENT_LEN, leaf->d.comment.str);
             char *b = strchr(tbuf, '\n');
 
             if(b) {
                 if(b[-1] == '\r') b[-1] = '\0';
                 *b = '\0';
-                sprintf(tlbuf, "\x03 ; %s\x02", tbuf);
+                sprintf_s(tlbuf, MAX_COMMENT_LEN + 8, "\x03 ; %s\x02", tbuf);
                 DrawChars(*cx, *cy + (POS_HEIGHT/2) - 1, tlbuf);
-                sprintf(tlbuf, "\x03 ; %s\x02", b+1);
+                sprintf_s(tlbuf, MAX_COMMENT_LEN + 8, "\x03 ; %s\x02", b+1);
                 DrawChars(*cx, *cy + (POS_HEIGHT/2), tlbuf);
             } else {
-                sprintf(tlbuf, "\x03 ; %s\x02", tbuf);
+                sprintf_s(tlbuf, MAX_COMMENT_LEN + 8, "\x03 ; %s\x02", tbuf);
                 DrawChars(*cx, *cy + (POS_HEIGHT/2) - 1, tlbuf);
             }
 
@@ -704,13 +704,13 @@ cmp:
                     s1[0] = '[';
                     s1[lmax-1] = ']';
                     s1[lmax] = '\0';
-                    strcpy(s2, s1);
+                    strcpy_s(s2, POS_WIDTH+10, s1);
                     memcpy(s1+1, leaf->d.cmp.op1, strlen(leaf->d.cmp.op1));
                     memcpy(s1+strlen(leaf->d.cmp.op1)+2, s, strlen(s));
                     memcpy(s2+2, leaf->d.cmp.op2, strlen(leaf->d.cmp.op2));
                 } else {
-                    strcpy(s1, "");
-                    strcpy(s2, TOO_LONG);
+                    strcpy_s(s1, POS_WIDTH+10, "");
+                    strcpy_s(s2, POS_WIDTH+10, TOO_LONG);
                 }
 
                 CenterWithSpaces(*cx, *cy, s1, poweredAfter, FALSE);
@@ -757,7 +757,7 @@ cmp:
 
             char buf[256];
             ElemCounter *c = &leaf->d.counter;
-            sprintf(buf, "[%s >=%d]", s, c->max);
+            sprintf_s(buf, 256, "[%s >=%d]", s, c->max);
 
             CenterWithSpaces(*cx, *cy, c->name, poweredAfter, TRUE);
             CenterWithWires(*cx, *cy, buf, poweredBefore, poweredAfter);
@@ -780,11 +780,11 @@ cmp:
             char buf[256];
             ElemTimer *t = &leaf->d.timer;
             if(t->delay >= 1000*1000) {
-                sprintf(buf, "[%s %.3f s]", s, t->delay/1000000.0);
+                sprintf_s(buf, 256, "[%s %.3f s]", s, t->delay/1000000.0);
             } else if(t->delay >= 100*1000) {
-                sprintf(buf, "[%s %.1f ms]", s, t->delay/1000.0);
+                sprintf_s(buf, 256, "[%s %.1f ms]", s, t->delay/1000.0);
             } else {
-                sprintf(buf, "[%s %.2f ms]", s, t->delay/1000.0);
+                sprintf_s(buf, 256, "[%s %.2f ms]", s, t->delay/1000.0);
             }
 
             CenterWithSpaces(*cx, *cy, t->name, poweredAfter, TRUE);
@@ -801,7 +801,7 @@ cmp:
             memcpy(str, srcStr, min(strlen(srcStr), POS_WIDTH*2 - 7));
 
             char bot[100];
-            sprintf(bot, "{\"%s\"}", str);
+            sprintf_s(bot, 100, "{\"%s\"}", str);
 
             int extra = 2*POS_WIDTH - strlen(leaf->d.fmtdStr.var);
             PoweredText(poweredAfter);

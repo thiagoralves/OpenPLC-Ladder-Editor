@@ -32,7 +32,7 @@
 
 #include "ldmicro.h"
 #include "intcode.h"
-#include "freeze.h"
+#include "../common/win32/freeze.h"
 
 static struct {
     char name[MAX_NAME_LEN];
@@ -131,7 +131,7 @@ static void SetSingleBit(char *name, BOOL state)
         }
     }
     if(i < MAX_IO) {
-        strcpy(SingleBitItems[i].name, name);
+        strcpy_s(SingleBitItems[i].name, MAX_NAME_LEN, name);
         SingleBitItems[i].powered = state;
         SingleBitItemsCount++;
     }
@@ -198,7 +198,7 @@ void SetAdcShadow(char *name, SWORD val)
             return;
         }
     }
-    strcpy(AdcShadows[i].name, name);
+    strcpy_s(AdcShadows[i].name, MAX_NAME_LEN, name);
     AdcShadows[i].val = val;
     AdcShadowsCount++;
 }
@@ -235,7 +235,7 @@ static char *MarkUsedVariable(char *name, DWORD flag)
     if(i >= MAX_IO) return "";
 
     if(i == VariablesCount) {
-        strcpy(Variables[i].name, name);
+        strcpy_s(Variables[i].name, MAX_NAME_LEN, name);
         Variables[i].usedFlags = 0;
         Variables[i].val = 0;
         VariablesCount++;
@@ -386,7 +386,7 @@ static void CheckVariableNamesCircuit(int which, void *elem)
             int i;
             for(i = 1; i < l->d.shiftRegister.stages; i++) {
                 char str[MAX_NAME_LEN+10];
-                sprintf(str, "%s%d", l->d.shiftRegister.name, i);
+                sprintf_s(str, MAX_NAME_LEN+10, "%s%d", l->d.shiftRegister.name, i);
                 MarkWithCheck(str, VAR_FLAG_ANY);
             }
             break;
@@ -768,22 +768,22 @@ void DescribeForIoList(char *name, char *out)
         case 'R':
         case 'X':
         case 'Y':
-            sprintf(out, "%d", SingleBitOn(name));
+            sprintf_s(out, MAX_NAME_LEN, "%d", SingleBitOn(name));
             break;
 
         case 'T': {
             double dtms = GetSimulationVariable(name) *
                 (Prog.cycleTime / 1000.0);
             if(dtms < 1000) {
-                sprintf(out, "%.2f ms", dtms);
+                sprintf_s(out, MAX_NAME_LEN, "%.2f ms", dtms);
             } else {
-                sprintf(out, "%.3f s", dtms / 1000);
+                sprintf_s(out, MAX_NAME_LEN, "%.3f s", dtms / 1000);
             }
             break;
         }
         default: {
             SWORD v = GetSimulationVariable(name);
-            sprintf(out, "%hd (0x%04hx)", v, v);
+            sprintf_s(out, MAX_NAME_LEN, "%hd (0x%04hx)", v, v);
             break;
         }
     }
@@ -952,7 +952,7 @@ static void AppendToUartSimulationTextControl(BYTE b)
         append[0] = b;
         append[1] = '\0';
     } else {
-        sprintf(append, "\\x%02x", b);
+        sprintf_s(append, 5, "\\x%02x", b);
     }
 
 #define MAX_SCROLLBACK 256
@@ -965,7 +965,7 @@ static void AppendToUartSimulationTextControl(BYTE b)
     if(overBy > 0) {
         memmove(buf, buf + overBy, strlen(buf));
     }
-    strcat(buf, append);
+    strcat_s(buf, MAX_SCROLLBACK, append);
 
     SendMessage(UartSimulationTextControl, WM_SETTEXT, 0, (LPARAM)buf);
     SendMessage(UartSimulationTextControl, EM_LINESCROLL, 0, (LPARAM)INT_MAX);

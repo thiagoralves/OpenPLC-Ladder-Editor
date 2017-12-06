@@ -205,7 +205,7 @@ BOOL ShowSimpleDialog(char *title, int boxes, char **labels, DWORD numOnlyMask,
             if(NoCheckingOnBox[i]) {
                 char get[64];
                 SendMessage(Textboxes[i], WM_GETTEXT, 60, (LPARAM)get);
-                strcpy(dests[i], get);
+                strcpy_s(dests[i], 1, get);
             } else {
                 char get[20];
                 SendMessage(Textboxes[i], WM_GETTEXT, 15, (LPARAM)get);
@@ -216,7 +216,7 @@ BOOL ShowSimpleDialog(char *title, int boxes, char **labels, DWORD numOnlyMask,
                     if(strlen(get) == 0) {
                         Error(_("Empty textbox; not permitted."));
                     } else {
-                        strcpy(dests[i], get);
+                        strcpy_s(dests[i], 1, get);
                     }
                 } else {
                     Error(_("Bad use of quotes: <%s>"), get);
@@ -245,13 +245,13 @@ void ShowTimerDialog(int which, int *delay, char *name)
 
     char delBuf[16];
     char nameBuf[16];
-    sprintf(delBuf, "%.3f", (*delay / 1000.0));
-    strcpy(nameBuf, name+1);
+    sprintf_s(delBuf, 16, "%.3f", (*delay / 1000.0));
+    strcpy_s(nameBuf, 16, name+1);
     char *dests[] = { nameBuf, delBuf };
 
     if(ShowSimpleDialog(s, 2, labels, (1 << 1), (1 << 0), (1 << 0), dests)) {
         name[0] = 'T';
-        strcpy(name+1, nameBuf);
+        strcpy_s(name+1, MAX_NAME_LEN-1, nameBuf);
         double del = atof(delBuf);
         if(del > 2140000) { // 2**31/1000, don't overflow signed int
             Error(_("Delay too long; maximum is 2**31 us."));
@@ -278,7 +278,7 @@ void ShowCounterDialog(int which, int *maxV, char *name)
     char *labels[] = { _("Name:"), (which == ELEM_CTC ? _("Max value:") : 
         _("True if >= :")) };
     char maxS[128];
-    sprintf(maxS, "%d", *maxV);
+    sprintf_s(maxS, 128, "%d", *maxV);
     char *dests[] = { name+1, maxS };
     ShowSimpleDialog(title, 2, labels, 0x2, 0x1, 0x1, dests);
     *maxV = atoi(maxS);
@@ -344,7 +344,7 @@ void ShowReadAdcDialog(char *name)
 void ShowSetPwmDialog(char *name, int *targetFreq)
 {
     char freq[100];
-    sprintf(freq, "%d", *targetFreq);
+    sprintf_s(freq, 100, "%d", *targetFreq);
 
     char *labels[] = { _("Duty cycle var:"), _("Frequency (Hz):") };
     char *dests[] = { name, freq };
@@ -388,7 +388,7 @@ void ShowMathDialog(int which, char *dest, char *op1, char *op2)
 void ShowShiftRegisterDialog(char *name, int *stages)
 {
     char stagesStr[20];
-    sprintf(stagesStr, "%d", *stages);
+    sprintf_s(stagesStr, 20, "%d", *stages);
 
     char *labels[] = { _("Name:"), _("Stages:") };
     char *dests[] = { name, stagesStr };

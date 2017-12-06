@@ -99,7 +99,7 @@
     <ClCompile Include="ldmicro\ldinterpret.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ldmicro\obj\helptext.cpp">
+    <ClCompile Include="ldmicro\helptext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +116,7 @@
     <ClInclude Include="ldmicro\mcutable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ldmicro\obj\lang-tables.h">
+    <ClInclude Include="ldmicro\lang-tables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

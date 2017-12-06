@@ -25,13 +25,13 @@
 // Jonathan Westhues, Oct 2004
 //-----------------------------------------------------------------------------
 #include <windows.h>
-#include <commctrl.h>
+#include <CommCtrl.h>
 #include <commdlg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "ldmicro.h"
-#include "freeze.h"
+#include "../common/win32/freeze.h"
 #include "mcutable.h"
 
 HINSTANCE   Instance;
@@ -146,7 +146,7 @@ static void CompileProgram(BOOL compileAs)
 	Prog.mcu=&SupportedMcus[ISA_ANSIC]; //define the MCU to ANSI C code
 	Prog.mcu->whichIsa = ISA_ANSIC;
 	Prog.cycleTime = 50000; //defines the cycle time to 50ms
-    sprintf(CurrentCompileFile, _("Core\\arduino\\libraries\\Ladder\\Ladder.cpp"));
+    sprintf_s(CurrentCompileFile, MAX_PATH, _("Core\\arduino\\libraries\\Ladder\\Ladder.cpp"));
 	if(compileAs || strlen(CurrentCompileFile)==0) {
         OPENFILENAME ofn;
 
@@ -284,7 +284,7 @@ static void OpenDialog(void)
         CurrentSaveFile[0] = '\0';
     } else {
         ProgramChangedNotSaved = FALSE;
-        strcpy(CurrentSaveFile, tempSaveFile);
+        strcpy_s(CurrentSaveFile, MAX_PATH, tempSaveFile);
         UndoFlush();
     }
 
@@ -350,14 +350,14 @@ static LRESULT CALLBACK MouseHook(int code, WPARAM wParam, LPARAM lParam)
 static void ProcessMenu(int code)
 {
     if(code >= MNU_PROCESSOR_0 && code < MNU_PROCESSOR_0+NUM_SUPPORTED_MCUS) {
-        strcpy(CurrentCompileFile, "");
+        strcpy_s(CurrentCompileFile, MAX_PATH, "");
         Prog.mcu = &SupportedMcus[code - MNU_PROCESSOR_0];
         RefreshControlsToSettings();
         return;
     }
     if(code == MNU_PROCESSOR_0+NUM_SUPPORTED_MCUS) {
         Prog.mcu = NULL;
-        strcpy(CurrentCompileFile, "");
+        strcpy_s(CurrentCompileFile, MAX_PATH, "");
         RefreshControlsToSettings();
         return;
     }
@@ -366,8 +366,8 @@ static void ProcessMenu(int code)
         case MNU_NEW:
             if(CheckSaveUserCancels()) break;
             NewProgram();
-            strcpy(CurrentSaveFile, "");
-            strcpy(CurrentCompileFile, "");
+            strcpy_s(CurrentSaveFile, MAX_PATH, "");
+            strcpy_s(CurrentCompileFile, MAX_PATH, "");
             GenerateIoListDontLoseSelection();
             RefreshScrollbars();
             UpdateMainWindowTitleBar();
@@ -814,8 +814,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                             if(r == IDNO) break;
                         }
                         NewProgram();
-                        strcpy(CurrentSaveFile, "");
-                        strcpy(CurrentCompileFile, "");
+                        strcpy_s(CurrentSaveFile, MAX_PATH, "");
+                        strcpy_s(CurrentCompileFile, MAX_PATH, "");
                         GenerateIoListDontLoseSelection();
                         RefreshScrollbars();
                         UpdateMainWindowTitleBar();
@@ -1073,15 +1073,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     ThawWindowPos(MainWindow);
     IoListHeight = 100;
     ThawDWORD(IoListHeight);
-
-    InitCommonControls();
+	INITCOMMONCONTROLSEX icex;
+	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	icex.dwICC = ICC_STANDARD_CLASSES;
+    InitCommonControlsEx(&icex);
     InitForDrawing();
 
     MakeMainWindowControls();
     MainWindowResized();
 
     NewProgram();
-    strcpy(CurrentSaveFile, "");
+    strcpy_s(CurrentSaveFile, MAX_PATH, "");
 
     // Check if we're running in non-interactive mode; in that case we should
     // load the file, compile, and exit.
@@ -1113,7 +1115,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             Error("Couldn't open '%s', running non-interactively.", source);
             exit(-1);
         }
-        strcpy(CurrentCompileFile, dest);
+        strcpy_s(CurrentCompileFile, MAX_PATH, dest);
         GenerateIoList(-1);
         CompileProgram(FALSE);
         exit(0);
@@ -1128,9 +1130,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if(strlen(lpCmdLine) > 0) {
         char line[MAX_PATH];
         if(*lpCmdLine == '"') { 
-            strcpy(line, lpCmdLine+1);
+            strcpy_s(line, MAX_PATH, lpCmdLine+1);
         } else {
-            strcpy(line, lpCmdLine);
+            strcpy_s(line, MAX_PATH, lpCmdLine);
         }
         if(strchr(line, '"')) *strchr(line, '"') = '\0';
 

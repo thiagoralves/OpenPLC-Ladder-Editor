@@ -18,8 +18,8 @@ void FreezeWindowPosF(HWND hwnd, char *subKey, char *name)
     HKEY software;
     if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_ALL_ACCESS, &software) != ERROR_SUCCESS)
         return;
-
-    char *keyName = (char *)malloc(strlen(name) + 30);
+	size_t name_len = strlen(name) + 30;
+    char *keyName = (char *)malloc(name_len);
     if(!keyName)
         return;
 
@@ -27,23 +27,23 @@ void FreezeWindowPosF(HWND hwnd, char *subKey, char *name)
     if(RegCreateKeyEx(software, subKey, 0, "", REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &sub, NULL) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_left", name);
+    sprintf_s(keyName, name_len, "%s_left", name);
     if(RegSetValueEx(sub, keyName, 0, REG_DWORD, (BYTE *)&(r.left), sizeof(DWORD)) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_right", name);
+    sprintf_s(keyName, name_len, "%s_right", name);
     if(RegSetValueEx(sub, keyName, 0, REG_DWORD, (BYTE *)&(r.right), sizeof(DWORD)) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_top", name);
+    sprintf_s(keyName, name_len, "%s_top", name);
     if(RegSetValueEx(sub, keyName, 0, REG_DWORD, (BYTE *)&(r.top), sizeof(DWORD)) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_bottom", name);
+    sprintf_s(keyName, name_len, "%s_bottom", name);
     if(RegSetValueEx(sub, keyName, 0, REG_DWORD, (BYTE *)&(r.bottom), sizeof(DWORD)) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_maximized", name);
+    sprintf_s(keyName, name_len, "%s_maximized", name);
     DWORD v = IsZoomed(hwnd);
     if(RegSetValueEx(sub, keyName, 0, REG_DWORD, (BYTE *)&(v), sizeof(DWORD)) != ERROR_SUCCESS)
         return;
@@ -69,35 +69,35 @@ void ThawWindowPosF(HWND hwnd, char *subKey, char *name)
     HKEY sub;
     if(RegOpenKeyEx(software, subKey, 0, KEY_ALL_ACCESS, &sub) != ERROR_SUCCESS)
         return;
-
-    char *keyName = (char *)malloc(strlen(name) + 30);
+	size_t name_len = strlen(name) + 30;
+    char *keyName = (char *)malloc(name_len);
     if(!keyName)
         return;
 
     DWORD l;
     RECT  r;
 
-    sprintf(keyName, "%s_left", name);
+    sprintf_s(keyName, name_len, "%s_left", name);
     l = sizeof(DWORD);
     if(RegQueryValueEx(sub, keyName, NULL, NULL, (BYTE *)&(r.left), &l) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_right", name);
+    sprintf_s(keyName, name_len, "%s_right", name);
     l = sizeof(DWORD);
     if(RegQueryValueEx(sub, keyName, NULL, NULL, (BYTE *)&(r.right), &l) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_top", name);
+    sprintf_s(keyName, name_len, "%s_top", name);
     l = sizeof(DWORD);
     if(RegQueryValueEx(sub, keyName, NULL, NULL, (BYTE *)&(r.top), &l) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_bottom", name);
+    sprintf_s(keyName, name_len, "%s_bottom", name);
     l = sizeof(DWORD);
     if(RegQueryValueEx(sub, keyName, NULL, NULL, (BYTE *)&(r.bottom), &l) != ERROR_SUCCESS)
         return;
 
-    sprintf(keyName, "%s_maximized", name);
+    sprintf_s(keyName, name_len, "%s_maximized", name);
     DWORD v;
     l = sizeof(DWORD);
     if(RegQueryValueEx(sub, keyName, NULL, NULL, (BYTE *)&v, &l) != ERROR_SUCCESS)

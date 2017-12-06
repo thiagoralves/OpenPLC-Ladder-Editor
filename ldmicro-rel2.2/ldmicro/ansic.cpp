@@ -46,7 +46,7 @@ static BOOL SeenVariable(char *name)
         }
     }
     if(i >= MAX_IO) oops();
-    strcpy(SeenVariables[i], name);
+    strcpy_s(SeenVariables[i], MAX_NAME_LEN, name);
     SeenVariablesCount++;
     return FALSE;
 }
@@ -81,9 +81,9 @@ static char *MapSym(char *str, int how)
 
     // User and internal symbols are distinguished.
     if(*str == '$') {
-        sprintf(ret, "I_%c_%s", bit_int, str+1);
+        sprintf_s(ret, RetCnt, "I_%c_%s", bit_int, str+1);
     } else {
-        sprintf(ret, "U_%c_%s", bit_int, str);
+        sprintf_s(ret, RetCnt, "U_%c_%s", bit_int, str);
     }
     return ret;
 }
@@ -93,7 +93,7 @@ static char *MapSym(char *str, int how)
 //-----------------------------------------------------------------------------
 static void DeclareInt(FILE *f, char *str)
 {
-    fprintf(f, "STATIC SWORD %s = 0;\n", str);
+    fprintf_s(f, "STATIC SWORD %s = 0;\n", str);
 }
 
 //-----------------------------------------------------------------------------
@@ -106,20 +106,20 @@ static void DeclareBit(FILE *f, char *str)
     // The mapped symbol has the form U_b_{X,Y,R}name, so look at character
     // four to determine if it's an input, output, internal relay.
     if(str[4] == 'X') {
-        fprintf(f, "\n");
-        fprintf(f, "/* You provide this function. */\n");
-        fprintf(f, "PROTO(extern BOOL Read_%s(void);)\n", str);
-        fprintf(f, "\n");
+        fprintf_s(f, "\n");
+        fprintf_s(f, "/* You provide this function. */\n");
+        fprintf_s(f, "PROTO(extern BOOL Read_%s(void);)\n", str);
+        fprintf_s(f, "\n");
     } else if(str[4] == 'Y') {
-        fprintf(f, "\n");
-        fprintf(f, "/* You provide these functions. */\n");
-        fprintf(f, "PROTO(BOOL Read_%s(void);)\n", str);
-        fprintf(f, "PROTO(void Write_%s(BOOL v);)\n", str);
-        fprintf(f, "\n");
+        fprintf_s(f, "\n");
+        fprintf_s(f, "/* You provide these functions. */\n");
+        fprintf_s(f, "PROTO(BOOL Read_%s(void);)\n", str);
+        fprintf_s(f, "PROTO(void Write_%s(BOOL v);)\n", str);
+        fprintf_s(f, "\n");
     } else {
-        fprintf(f, "STATIC BOOL %s = 0;\n", str);
-        fprintf(f, "#define Read_%s() %s\n", str, str);
-        fprintf(f, "#define Write_%s(x) %s = x\n", str, str);
+        fprintf_s(f, "STATIC BOOL %s = 0;\n", str);
+        fprintf_s(f, "#define Read_%s() %s\n", str, str);
+        fprintf_s(f, "#define Write_%s(x) %s = x\n", str, str);
     }
 }
 
@@ -231,30 +231,30 @@ static void GenerateAnsiC(FILE *f)
         if(IntCode[i].op == INT_ELSE) indent--;
 
         int j;
-        for(j = 0; j < indent; j++) fprintf(f, "    ");
+        for(j = 0; j < indent; j++) fprintf_s(f, "    ");
 
         switch(IntCode[i].op) {
             case INT_SET_BIT:
-                fprintf(f, "Write_%s(1);\n", MapSym(IntCode[i].name1, ASBIT));
+                fprintf_s(f, "Write_%s(1);\n", MapSym(IntCode[i].name1, ASBIT));
                 break;
 
             case INT_CLEAR_BIT:
-                fprintf(f, "Write_%s(0);\n", MapSym(IntCode[i].name1, ASBIT));
+                fprintf_s(f, "Write_%s(0);\n", MapSym(IntCode[i].name1, ASBIT));
                 break;
 
             case INT_COPY_BIT_TO_BIT:
-                fprintf(f, "Write_%s(Read_%s());\n",
+                fprintf_s(f, "Write_%s(Read_%s());\n",
                     MapSym(IntCode[i].name1, ASBIT),
                     MapSym(IntCode[i].name2, ASBIT));
                 break;
 
             case INT_SET_VARIABLE_TO_LITERAL:
-                fprintf(f, "%s = %d;\n", MapSym(IntCode[i].name1, ASINT),
+                fprintf_s(f, "%s = %d;\n", MapSym(IntCode[i].name1, ASINT),
                     IntCode[i].literal);
                 break;
 
             case INT_SET_VARIABLE_TO_VARIABLE:
-                fprintf(f, "%s = %s;\n", MapSym(IntCode[i].name1, ASINT),
+                fprintf_s(f, "%s = %s;\n", MapSym(IntCode[i].name1, ASINT),
                                          MapSym(IntCode[i].name2, ASINT));
                 break;
 
@@ -265,7 +265,7 @@ static void GenerateAnsiC(FILE *f)
                 case INT_SET_VARIABLE_MULTIPLY: op = '*'; goto arith;
                 case INT_SET_VARIABLE_DIVIDE: op = '/'; goto arith;
                 arith:
-                    fprintf(f, "%s = %s %c %s;\n",
+                    fprintf_s(f, "%s = %s %c %s;\n",
                         MapSym(IntCode[i].name1, ASINT),
                         MapSym(IntCode[i].name2, ASINT),
                         op,
@@ -274,57 +274,57 @@ static void GenerateAnsiC(FILE *f)
             }
 
             case INT_INCREMENT_VARIABLE:
-                fprintf(f, "%s++;\n", MapSym(IntCode[i].name1, ASINT));
+                fprintf_s(f, "%s++;\n", MapSym(IntCode[i].name1, ASINT));
                 break;
 
             case INT_IF_BIT_SET:
-                fprintf(f, "if(Read_%s()) {\n",
+                fprintf_s(f, "if(Read_%s()) {\n",
                     MapSym(IntCode[i].name1, ASBIT));
                 indent++;
                 break;
 
             case INT_IF_BIT_CLEAR:
-                fprintf(f, "if(!Read_%s()) {\n",
+                fprintf_s(f, "if(!Read_%s()) {\n",
                     MapSym(IntCode[i].name1, ASBIT));
                 indent++;
                 break;
 
             case INT_IF_VARIABLE_LES_LITERAL:
-                fprintf(f, "if(%s < %d) {\n", MapSym(IntCode[i].name1, ASINT),
+                fprintf_s(f, "if(%s < %d) {\n", MapSym(IntCode[i].name1, ASINT),
                     IntCode[i].literal);
                 indent++;
                 break;
 
             case INT_IF_VARIABLE_EQUALS_VARIABLE:
-                fprintf(f, "if(%s == %s) {\n", MapSym(IntCode[i].name1, ASINT),
+                fprintf_s(f, "if(%s == %s) {\n", MapSym(IntCode[i].name1, ASINT),
                                                MapSym(IntCode[i].name2, ASINT));
                 indent++;
                 break;
 
             case INT_IF_VARIABLE_GRT_VARIABLE:
-                fprintf(f, "if(%s > %s) {\n", MapSym(IntCode[i].name1, ASINT),
+                fprintf_s(f, "if(%s > %s) {\n", MapSym(IntCode[i].name1, ASINT),
                                               MapSym(IntCode[i].name2, ASINT));
                 indent++;
                 break;
 
             case INT_END_IF:
-                fprintf(f, "}\n");
+                fprintf_s(f, "}\n");
                 break;
 
             case INT_ELSE:
-                fprintf(f, "} else {\n"); indent++;
+                fprintf_s(f, "} else {\n"); indent++;
                 break;
 
             case INT_SIMULATE_NODE_STATE:
                 // simulation-only
-                fprintf(f, "\n");
+                fprintf_s(f, "\n");
                 break;
 
             case INT_COMMENT:
                 if(IntCode[i].name1[0]) {
-                    fprintf(f, "/* %s */\n", IntCode[i].name1);
+                    fprintf_s(f, "/* %s */\n", IntCode[i].name1);
                 } else {
-                    fprintf(f, "\n");
+                    fprintf_s(f, "\n");
                 }
                 break;
 
@@ -349,13 +349,13 @@ void CompileAnsiC(char *dest)
 {
     SeenVariablesCount = 0;
 
-    FILE *f = fopen(dest, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, dest, "w")==EINVAL) {
         Error(_("Couldn't open file '%s'"), dest);
         return;
     }
 
-    fprintf(f,
+    fprintf_s(f,
 "/* This is auto-generated code from LDmicro. Do not edit this file! Go\n"
 "   back to the ladder diagram source for changes in the logic, and make\n"
 "   any C additions either in ladder.h or in additional .c files linked\n"
@@ -403,7 +403,7 @@ void CompileAnsiC(char *dest)
     // now generate declarations for all variables
     GenerateDeclarations(f);
 
-    fprintf(f,
+    fprintf_s(f,
 "\n"
 "\n"
 "/* Call this function once per PLC cycle. You are responsible for calling\n"
@@ -415,14 +415,14 @@ void CompileAnsiC(char *dest)
 
     GenerateAnsiC(f);
 
-    fprintf(f, "}\n");
+    fprintf_s(f, "}\n");
     fclose(f);
 
     char str[MAX_PATH+500];
 
-	sprintf(str, _("Please wait until OpenPLC Ladder compiles your code and send it to the PLC"));
+	sprintf_s(str, MAX_PATH+500, _("Please wait until OpenPLC Ladder compiles your code and send it to the PLC"));
 	/*
-    sprintf(str, _("Compile successful; wrote C source code to '%s'.\r\n\r\n"
+    sprintf_s(str, MAX_PATH+500, _("Compile successful; wrote C source code to '%s'.\r\n\r\n"
         "This is not a complete C program. You have to provide the runtime "
         "and all the I/O routines. See the comments in the source code for "
         "information about how to do this."), dest);

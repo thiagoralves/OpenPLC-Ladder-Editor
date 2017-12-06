@@ -460,7 +460,7 @@ static void WriteHexFile(FILE *f)
     }
 
     // end of file record
-    fprintf(f, ":00000001FF\n");
+    fprintf_s(f, ":00000001FF\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -1327,8 +1327,8 @@ static void DivideRoutine(void)
 //-----------------------------------------------------------------------------
 void CompileAvr(char *outFile)
 {
-    FILE *f = fopen(outFile, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, outFile, "w")==EINVAL) {
         Error(_("Couldn't open file '%s'"), outFile);
         return;
     }
@@ -1395,7 +1395,7 @@ void CompileAvr(char *outFile)
     fclose(f);
 
     char str[MAX_PATH+500];
-    sprintf(str, _("Compile successful; wrote IHEX for AVR to '%s'.\r\n\r\n"
+    sprintf_s(str, MAX_PATH+500, _("Compile successful; wrote IHEX for AVR to '%s'.\r\n\r\n"
         "Remember to set the processor configuration (fuses) correctly. "
         "This does not happen automatically."), outFile);
     CompileSuccessfulMessage(str);
