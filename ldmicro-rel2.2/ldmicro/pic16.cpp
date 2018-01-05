@@ -365,7 +365,7 @@ static void WriteHexFile(FILE *f)
     DWORD soFarStart = 0;
 
     // always start from address 0
-    fprintf(f, ":020000040000FA\n");
+    fprintf_s(f, ":020000040000FA\n");
 
     DWORD i;
     for(i = 0; i < PicProgWriteP; i++) {
@@ -417,7 +417,7 @@ static void WriteHexFile(FILE *f)
     FinishIhex(f);
 
     // end of file record
-    fprintf(f, ":00000001FF\n");
+    fprintf_s(f, ":00000001FF\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -1401,8 +1401,8 @@ static void WriteDivideRoutine(void)
 //-----------------------------------------------------------------------------
 void CompilePic16(char *outFile)
 {
-    FILE *f = fopen(outFile, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, outFile, "w")==EINVAL) {
         Error(_("Couldn't open file '%s'"), outFile);
         return;
     }
@@ -1615,7 +1615,7 @@ void CompilePic16(char *outFile)
     fclose(f);
 
     char str[MAX_PATH+500];
-    sprintf(str, _("Compile successful; wrote IHEX for PIC16 to '%s'.\r\n\r\n"
+    sprintf_s(str, MAX_PATH+500, _("Compile successful; wrote IHEX for PIC16 to '%s'.\r\n\r\n"
         "Configuration word (fuses) has been set for crystal oscillator, BOD "
         "enabled, LVP disabled, PWRT enabled, all code protection off.\r\n\r\n" 
         "Used %d/%d words of program flash (chip %d%% full)."),

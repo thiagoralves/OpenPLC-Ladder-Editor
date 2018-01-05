@@ -25,6 +25,8 @@
 #define __LDMICRO_H
 
 #include <setjmp.h>
+#include <Windows.h>
+#include <stdio.h>
 typedef signed short SWORD;
 typedef signed long SDWORD;
 
@@ -38,6 +40,15 @@ typedef signed long SDWORD;
 #define FONT_WIDTH   7
 #define FONT_HEIGHT 13
 
+// Pre-Processsor language choices.  Uncomment your language
+// TODO: automatically decide based on compile env
+#define LDLANG_EN
+//#define LDLANG_DE
+//#define LDLANG_ES
+//#define LDLANG_FR
+//#define LDLANG_IT
+//#define LDLANG_PT
+//#define LDLANG_TR
 
 //-----------------------------------------------
 // Constants for the GUI. We have drop-down menus, a listview for the I/Os,

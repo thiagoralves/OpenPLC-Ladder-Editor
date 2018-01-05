@@ -23,7 +23,7 @@
 // Jonathan Westhues, Nov 2004
 //-----------------------------------------------------------------------------
 #include <windows.h>
-#include <commctrl.h>
+#include <CommCtrl.h>
 #include <commdlg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,17 +119,17 @@ void UpdateMainWindowTitleBar(void)
     char line[MAX_PATH+100];
     if(InSimulationMode) {
         if(RealTimeSimulationRunning) {
-            strcpy(line, _("OpenPLC Ladder - Simulation (Running)"));
+            strcpy_s(line, MAX_PATH+100, _("OpenPLC Ladder - Simulation (Running)"));
         } else {
-            strcpy(line, _("OpenPLC Ladder - Simulation (Stopped)"));
+            strcpy_s(line, MAX_PATH+100, _("OpenPLC Ladder - Simulation (Stopped)"));
         }
     } else {
-        strcpy(line, _("OpenPLC Ladder - Program Editor"));
+        strcpy_s(line, MAX_PATH+100, _("OpenPLC Ladder - Program Editor"));
     }
     if(strlen(CurrentSaveFile) > 0) {
-        sprintf(line+strlen(line), " - %s", CurrentSaveFile);
+        sprintf_s(line+strlen(line), MAX_PATH+100-strlen(line), " - %s", CurrentSaveFile);
     } else {
-        strcat(line, _(" - (not yet saved)"));
+        strcat_s(line, MAX_PATH+100, _(" - (not yet saved)"));
     }
 
     SetWindowText(MainWindow, line);
@@ -221,7 +221,6 @@ void SetUndoEnabled(BOOL undoEnabled, BOOL redoEnabled)
 HMENU MakeMainWindowMenus(void)
 {
     HMENU compile, help; //settings, compile, help;
-    int i;
 
     FileMenu = CreatePopupMenu();
     AppendMenu(FileMenu, MF_STRING,   MNU_NEW,    _("&New\tCtrl+N"));
@@ -571,15 +570,15 @@ void RefreshControlsToSettings(void)
         SendMessage(StatusBar, SB_SETTEXT, 0, (LPARAM)_("no MCU selected"));
     }
     char buf[256];
-    sprintf(buf, _("cycle time %.2f ms"), (double)Prog.cycleTime/1000.0);
+    sprintf_s(buf, 256, _("cycle time %.2f ms"), (double)Prog.cycleTime/1000.0);
     SendMessage(StatusBar, SB_SETTEXT, 1, (LPARAM)buf);
 
     if(Prog.mcu && (Prog.mcu->whichIsa == ISA_ANSIC ||
         Prog.mcu->whichIsa == ISA_INTERPRETED))
     {
-        strcpy(buf, "");
+        strcpy_s(buf, 256, "");
     } else {
-        sprintf(buf, _("processor clock %.4f MHz"),
+        sprintf_s(buf, 256, _("processor clock %.4f MHz"),
             (double)Prog.mcuClock/1000000.0);
     }
     SendMessage(StatusBar, SB_SETTEXT, 2, (LPARAM)buf);

@@ -79,7 +79,7 @@ static void AppendIo(char *name, int type)
     if(i < MAX_IO) {
         Prog.io.assignment[i].type = type;
         Prog.io.assignment[i].pin = NO_PIN_ASSIGNED;
-        strcpy(Prog.io.assignment[i].name, name);
+        strcpy_s(Prog.io.assignment[i].name, MAX_NAME_LEN, name);
         (Prog.io.count)++;
     }
 }
@@ -114,7 +114,7 @@ static void AppendIoSeenPreviously(char *name, int type, int pin)
     i = IoSeenPreviouslyCount;
     IoSeenPreviously[i].type = type;
     IoSeenPreviously[i].pin = pin;
-    strcpy(IoSeenPreviously[i].name, name);
+    strcpy_s(IoSeenPreviously[i].name, MAX_NAME_LEN, name);
     IoSeenPreviouslyCount++;
 }
 
@@ -223,7 +223,7 @@ static void ExtractNamesFromCircuit(int which, void *any)
             int i;
             for(i = 0; i < l->d.shiftRegister.stages; i++) {
                 char str[MAX_NAME_LEN+10];
-                sprintf(str, "%s%d", l->d.shiftRegister.name, i);
+				sprintf_s(str, MAX_NAME_LEN+10, "%s%d", l->d.shiftRegister.name, i);
                 AppendIo(str, IO_TYPE_GENERAL);
             }
             break;
@@ -290,7 +290,7 @@ int GenerateIoList(int prevSel)
 
     char selName[MAX_NAME_LEN];
     if(prevSel >= 0) {
-        strcpy(selName, Prog.io.assignment[prevSel].name);
+        strcpy_s(selName, MAX_NAME_LEN, Prog.io.assignment[prevSel].name);
     }
 
     if(IoSeenPreviouslyCount > MAX_IO_SEEN_PREVIOUSLY/2) {
@@ -357,7 +357,7 @@ BOOL LoadIoListFromFile(FILE *f)
             return TRUE;
         }
         // Don't internationalize this! It's the file format, not UI.
-        if(sscanf(line, "    %s at %d", name, &pin)==2) {
+        if(sscanf_s(line, "    %s at %d", name, MAX_NAME_LEN, &pin)==2) {
             int type;
             switch(name[0]) {
                 case 'X': type = IO_TYPE_DIG_INPUT; break;
@@ -384,7 +384,7 @@ void SaveIoListToFile(FILE *f)
            Prog.io.assignment[i].type == IO_TYPE_READ_ADC)
         {
             // Don't internationalize this! It's the file format, not UI.
-            fprintf(f, "    %s at %d\n", Prog.io.assignment[i].name,
+            fprintf_s(f, "    %s at %d\n", Prog.io.assignment[i].name,
                 Prog.io.assignment[i].pin);
         }
     }
@@ -690,11 +690,11 @@ void ShowIoDialog(int item)
 
         char buf[40];
         if(Prog.mcu->pinCount <= 21) {
-            sprintf(buf, "%3d   %c%c%d", Prog.mcu->pinInfo[i].pin,
+            sprintf_s(buf, 40, "%3d   %c%c%d", Prog.mcu->pinInfo[i].pin,
                 Prog.mcu->portPrefix, Prog.mcu->pinInfo[i].port,
                 Prog.mcu->pinInfo[i].bit);
         } else {
-            sprintf(buf, "%3d  %c%c%d", Prog.mcu->pinInfo[i].pin,
+            sprintf_s(buf, 40, "%3d  %c%c%d", Prog.mcu->pinInfo[i].pin,
                 Prog.mcu->portPrefix, Prog.mcu->pinInfo[i].port,
                 Prog.mcu->pinInfo[i].bit);
         }
@@ -780,7 +780,7 @@ void IoListProc(NMHDR *h)
                     if(Prog.mcu && (Prog.mcu->whichIsa == ISA_ANSIC ||
                                     Prog.mcu->whichIsa == ISA_INTERPRETED) )
                     {
-                        strcpy(i->item.pszText, "");
+                        strcpy_s(i->item.pszText, 1, "");
                         break;
                     }
 
@@ -790,18 +790,18 @@ void IoListProc(NMHDR *h)
 
                 case LV_IO_TYPE: {
                     char *s = IoTypeToString(Prog.io.assignment[item].type);
-                    strcpy(i->item.pszText, s);
+                    strcpy_s(i->item.pszText, MAX_NAME_LEN, s);
                     break;
                 }
                 case LV_IO_NAME:
-                    strcpy(i->item.pszText, Prog.io.assignment[item].name);
+                    strcpy_s(i->item.pszText, MAX_NAME_LEN, Prog.io.assignment[item].name);
                     break;
 
                 case LV_IO_PORT: {
                     // Don't confuse people by displaying bogus pin assignments
                     // for the C target.
                     if(Prog.mcu && Prog.mcu->whichIsa == ISA_ANSIC) {
-                        strcpy(i->item.pszText, "");
+                        strcpy_s(i->item.pszText, 1, "");
                         break;
                     }
 
@@ -809,13 +809,13 @@ void IoListProc(NMHDR *h)
                     if(type != IO_TYPE_DIG_INPUT && type != IO_TYPE_DIG_OUTPUT
                         && type != IO_TYPE_READ_ADC)
                     {
-                        strcpy(i->item.pszText, "");
+                        strcpy_s(i->item.pszText, 1, "");
                         break;
                     }
 
                     int pin = Prog.io.assignment[item].pin;
                     if(pin == NO_PIN_ASSIGNED || !Prog.mcu) {
-                        strcpy(i->item.pszText, "");
+                        strcpy_s(i->item.pszText, 1, "");
                         break;
                     }
 
@@ -823,14 +823,14 @@ void IoListProc(NMHDR *h)
                         if((Prog.mcu->uartNeeds.rxPin == pin) ||
                            (Prog.mcu->uartNeeds.txPin == pin))
                         {
-                            strcpy(i->item.pszText, _("<UART needs!>"));
+                            strcpy_s(i->item.pszText, MAX_NAME_LEN, _("<UART needs!>"));
                             break;
                         }
                     }
 
                     if(PwmFunctionUsed() && Prog.mcu) {
                         if(Prog.mcu->pwmNeedsPin == pin) {
-                            strcpy(i->item.pszText, _("<PWM needs!>"));
+                            strcpy_s(i->item.pszText, MAX_NAME_LEN, _("<PWM needs!>"));
                             break;
                         }
                     }
@@ -838,7 +838,7 @@ void IoListProc(NMHDR *h)
                     int j;
                     for(j = 0; j < Prog.mcu->pinCount; j++) {
                         if(Prog.mcu->pinInfo[j].pin == pin) {
-                            sprintf(i->item.pszText, "%c%c%d",
+                            sprintf_s(i->item.pszText, MAX_NAME_LEN, "%c%c%d",
                                 Prog.mcu->portPrefix,
                                 Prog.mcu->pinInfo[j].port,
                                 Prog.mcu->pinInfo[j].bit);
@@ -846,7 +846,7 @@ void IoListProc(NMHDR *h)
                         }
                     }
                     if(j == Prog.mcu->pinCount) {
-                        sprintf(i->item.pszText, _("<not an I/O!>"));
+                        sprintf_s(i->item.pszText, MAX_NAME_LEN, _("<not an I/O!>"));
                     }
                     break;
                 }
@@ -856,7 +856,7 @@ void IoListProc(NMHDR *h)
                         char *name = Prog.io.assignment[item].name;
                         DescribeForIoList(name, i->item.pszText);
                     } else {
-                        strcpy(i->item.pszText, "");
+                        strcpy_s(i->item.pszText, 1, "");
                     }
                     break;
                 }

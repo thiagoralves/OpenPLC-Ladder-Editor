@@ -54,7 +54,7 @@ static WORD AddrForInternalRelay(char *name)
             return i;
         }
     }
-    strcpy(InternalRelays[i], name);
+    strcpy_s(InternalRelays[i], MAX_NAME_LEN, name);
     InternalRelaysCount++;
     return i;
 }
@@ -67,7 +67,7 @@ static WORD AddrForVariable(char *name)
             return i;
         }
     }
-    strcpy(Variables[i], name);
+    strcpy_s(Variables[i], MAX_NAME_LEN, name);
     VariablesCount++;
     return i;
 }
@@ -77,15 +77,15 @@ static void Write(FILE *f, BinOp *op)
     BYTE *b = (BYTE *)op;
     int i;
     for(i = 0; i < sizeof(*op); i++) {
-        fprintf(f, "%02x", b[i]);
+        fprintf_s(f, "%02x", b[i]);
     }
-    fprintf(f, "\n");
+    fprintf_s(f, "\n");
 }
 
 void CompileInterpreted(char *outFile)
 {
-    FILE *f = fopen(outFile, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, outFile, "w")==EINVAL) {
         Error(_("Couldn't write to '%s'"), outFile);
         return;
     }
@@ -93,7 +93,7 @@ void CompileInterpreted(char *outFile)
     InternalRelaysCount = 0;
     VariablesCount = 0;
 
-    fprintf(f, "$$LDcode\n");
+    fprintf_s(f, "$$LDcode\n");
 
     int ipc;
     int outPc;
@@ -222,25 +222,25 @@ finishIf:
     Write(f, &op);
 
 
-    fprintf(f, "$$bits\n");
+    fprintf_s(f, "$$bits\n");
     for(i = 0; i < InternalRelaysCount; i++) {
         if(InternalRelays[i][0] != '$') {
-            fprintf(f, "%s,%d\n", InternalRelays[i], i);
+            fprintf_s(f, "%s,%d\n", InternalRelays[i], i);
         }
     }
-    fprintf(f, "$$int16s\n");
+    fprintf_s(f, "$$int16s\n");
     for(i = 0; i < VariablesCount; i++) {
         if(Variables[i][0] != '$') {
-            fprintf(f, "%s,%d\n", Variables[i], i);
+            fprintf_s(f, "%s,%d\n", Variables[i], i);
         }
     }
 
-    fprintf(f, "$$cycle %d us\n", Prog.cycleTime);
+    fprintf_s(f, "$$cycle %d us\n", Prog.cycleTime);
 
     fclose(f);
 
     char str[MAX_PATH+500];
-    sprintf(str,
+    sprintf_s(str, MAX_PATH+500, 
       _("Compile successful; wrote interpretable code to '%s'.\r\n\r\n"
         "You probably have to adapt the interpreter to your application. See "
         "the documentation."), outFile);

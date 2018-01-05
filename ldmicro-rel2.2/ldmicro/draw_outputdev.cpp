@@ -285,9 +285,11 @@ void PaintWindow(void)
 
             if(rung < 10) {
                 char r[1] = { rung + '0' };
-                TextOut(Hdc, 8 + FONT_WIDTH, yp, r, 1);
+                // the hell is this?^^
+				TextOut(Hdc, 8 + FONT_WIDTH, yp, r, 1);
             } else {
                 char r[2] = { (rung / 10) + '0', (rung % 10) + '0' };
+				// wut? ^^
                 TextOut(Hdc, 8, yp, r, 2);
             }
 
@@ -502,36 +504,36 @@ void ExportDrawingAsText(char *file)
     cy -= 2;
     DrawEndRung(5, cy);
 
-    FILE *f = fopen(file, "w");
-    if(!f) {
+    FILE *f;
+    if(fopen_s(&f, file, "w")==EINVAL) {
         Error(_("Couldn't open '%s'\n"), f);
         return;
     }
 
-    fprintf(f, "LDmicro export text\n");
+    fprintf_s(f, "LDmicro export text\n");
 
     if(Prog.mcu) {
-        fprintf(f, "for '%s', %.6f MHz crystal, %.1f ms cycle time\n\n",
+        fprintf_s(f, "for '%s', %.6f MHz crystal, %.1f ms cycle time\n\n",
             Prog.mcu->mcuName, Prog.mcuClock/1e6, Prog.cycleTime/1e3);
     } else {
-        fprintf(f, "no MCU assigned, %.6f MHz crystal, %.1f ms cycle time\n\n",
+        fprintf_s(f, "no MCU assigned, %.6f MHz crystal, %.1f ms cycle time\n\n",
             Prog.mcuClock/1e6, Prog.cycleTime/1e3);
     }
 
-    fprintf(f, "\nLADDER DIAGRAM:\n\n");
+    fprintf_s(f, "\nLADDER DIAGRAM:\n\n");
 
     for(i = 0; i < totalHeight; i++) {
         ExportBuffer[i][4] = '|';
-        fprintf(f, "%s\n", ExportBuffer[i]);
+        fprintf_s(f, "%s\n", ExportBuffer[i]);
         CheckFree(ExportBuffer[i]);
     }
     CheckFree(ExportBuffer);
     ExportBuffer = NULL;
 
-    fprintf(f, _("\n\nI/O ASSIGNMENT:\n\n"));
+    fprintf_s(f, _("\n\nI/O ASSIGNMENT:\n\n"));
     
-    fprintf(f, _("  Name                       | Type               | Pin\n"));
-    fprintf(f,   " ----------------------------+--------------------+------\n");
+    fprintf_s(f, _("  Name                       | Type               | Pin\n"));
+    fprintf_s(f,   " ----------------------------+--------------------+------\n");
     for(i = 0; i < Prog.io.count; i++) {
         char b[1024];
         memset(b, '\0', sizeof(b));
@@ -542,12 +544,12 @@ void ExportDrawingAsText(char *file)
 
         PinNumberForIo(pin, io);
 
-        sprintf(b, "                             |                    | %s\n",
+        sprintf_s(b, 1024, "                             |                    | %s\n",
             pin);
 
         memcpy(b+2, io->name, strlen(io->name));
         memcpy(b+31, type, strlen(type));
-        fprintf(f, "%s", b);
+        fprintf_s(f, "%s", b);
     }
 
     fclose(f);

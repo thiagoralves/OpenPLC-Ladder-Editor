@@ -279,7 +279,7 @@ static void MakeLutControls(BOOL asString, int count, BOOL forPwl)
             }
 
             char buf[20];
-            sprintf(buf, "%d", ValuesCache[i]);
+            sprintf_s(buf, 20, "%d", ValuesCache[i]);
             ValuesTextbox[i] = CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, buf,
                 WS_CHILD | ES_AUTOHSCROLL | WS_TABSTOP | WS_CLIPSIBLINGS |
                     WS_VISIBLE,
@@ -287,9 +287,9 @@ static void MakeLutControls(BOOL asString, int count, BOOL forPwl)
             NiceFont(ValuesTextbox[i]);
 
             if(forPwl) {
-                sprintf(buf, "%c%d:", (i & 1) ? 'y' : 'x', i/2);
+                sprintf_s(buf, 20, "%c%d:", (i & 1) ? 'y' : 'x', i/2);
             } else {
-                sprintf(buf, "%2d:", i);
+                sprintf_s(buf, 20, "%2d:", i);
             }
             ValuesLabel[i] = CreateWindowEx(0, WC_STATIC, buf,
                 WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
@@ -337,7 +337,7 @@ BOOL StringToValuesCache(char *str, int *c)
     }
 
     char buf[10];
-    sprintf(buf, "%d", count);
+    sprintf_s(buf, 10, "%d", count);
     SendMessage(CountTextbox, WM_SETTEXT, 0, (LPARAM)(buf));
     *c = count;
     return TRUE;
@@ -377,7 +377,7 @@ void ShowLookUpTableDialog(ElemLeaf *l)
     SendMessage(DestTextbox, WM_SETTEXT, 0, (LPARAM)(t->dest));
     SendMessage(IndexTextbox, WM_SETTEXT, 0, (LPARAM)(t->index));
     char buf[30];
-    sprintf(buf, "%d", t->count);
+    sprintf_s(buf, 30, "%d", t->count);
     SendMessage(CountTextbox, WM_SETTEXT, 0, (LPARAM)buf);
     if(asString) {
         SendMessage(AsStringCheckbox, BM_SETCHECK, BST_CHECKED, 0);
@@ -434,7 +434,7 @@ void ShowLookUpTableDialog(ElemLeaf *l)
                 (LPARAM)scratch);
             if(strcmp(scratch, PrevTableAsString)!=0) {
                 if(StringToValuesCache(scratch, &count)) {
-                    strcpy(PrevTableAsString, scratch);
+                    strcpy_s(PrevTableAsString, 1024, scratch);
                 } else {
                     // Too long; put back the old one
                     SendMessage(StringTextbox, WM_SETTEXT, 0,
@@ -502,7 +502,7 @@ void ShowPiecewiseLinearDialog(ElemLeaf *l)
     SendMessage(DestTextbox, WM_SETTEXT, 0, (LPARAM)(t->dest));
     SendMessage(IndexTextbox, WM_SETTEXT, 0, (LPARAM)(t->index));
     char buf[30];
-    sprintf(buf, "%d", t->count);
+    sprintf_s(buf, 30, "%d", t->count);
     SendMessage(CountTextbox, WM_SETTEXT, 0, (LPARAM)buf);
 
     // And show the window

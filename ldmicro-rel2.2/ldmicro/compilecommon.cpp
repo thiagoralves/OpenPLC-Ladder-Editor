@@ -185,7 +185,7 @@ void MemForVariable(char *name, DWORD *addrl, DWORD *addrh)
     }
     if(i == VariableCount) {
         VariableCount++;
-        strcpy(Variables[i].name, name);
+        strcpy_s(Variables[i].name, MAX_NAME_LEN, name);
         Variables[i].addrl = AllocOctetRam();
         Variables[i].addrh = AllocOctetRam();
     }
@@ -210,7 +210,7 @@ static void MemForBitInternal(char *name, DWORD *addr, int *bit, BOOL writeTo)
     }
     if(i == InternalRelayCount) {
         InternalRelayCount++;
-        strcpy(InternalRelays[i].name, name);
+        strcpy_s(InternalRelays[i].name, MAX_NAME_LEN, name);
         AllocBitRam(&InternalRelays[i].addr, &InternalRelays[i].bit);
         InternalRelays[i].assignedTo = FALSE;
     }

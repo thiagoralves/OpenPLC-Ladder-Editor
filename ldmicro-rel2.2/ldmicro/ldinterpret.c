@@ -92,7 +92,7 @@ int SpecialAddrForXosc;
 //
 void BadFormat(void)
 {
-    fprintf(stderr, "Bad program format.\n");
+    fprintf_s(stderr, "Bad program format.\n");
     exit(-1);
 }
 int HexDigit(int c)
@@ -110,13 +110,13 @@ int HexDigit(int c)
 void LoadProgram(char *fileName)
 {
     int pc;
-    FILE *f = fopen(fileName, "r");
+    FILE *f;
     char line[80];
 
     // This is not suitable for untrusted input.
 
-    if(!f) {
-        fprintf(stderr, "couldn't open '%s'\n", f);
+    if(fopen_s(&f, fileName, "r")==EINVAL) {
+        fprintf_s(stderr, "couldn't open '%s'\n", fileName);
         exit(-1);
     }
 
@@ -151,7 +151,7 @@ void LoadProgram(char *fileName)
         }
         if(memcmp(line, "$$cycle", 7)==0) {
             if(atoi(line + 7) != 10*1000) {
-                fprintf(stderr, "cycle time was not 10 ms when compiled; "
+                fprintf_s(stderr, "cycle time was not 10 ms when compiled; "
                     "please fix that.\n");
                 exit(-1);
             }
@@ -159,7 +159,7 @@ void LoadProgram(char *fileName)
     }
 
     if(SpecialAddrForA < 0 || SpecialAddrForXosc < 0) {
-        fprintf(stderr, "special interface variables 'a' or 'Xosc' not "
+        fprintf_s(stderr, "special interface variables 'a' or 'Xosc' not "
             "used in prog.\n");
         exit(-1);
     }
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
     int i;
 
     if(argc != 2) {
-        fprintf(stderr, "usage: %s xxx.int\n", argv[0]);
+        fprintf_s(stderr, "usage: %s xxx.int\n", argv[0]);
         return -1;
     }
 

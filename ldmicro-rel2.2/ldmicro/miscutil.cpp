@@ -54,7 +54,7 @@ void dbp(char *str, ...)
     va_list f;
     char buf[1024];
     va_start(f, str);
-    vsprintf(buf, str, f);
+    vsprintf_s(buf, 1024, str, f);
     OutputDebugString(buf);
     OutputDebugString("\n");
 }
@@ -87,7 +87,7 @@ void Error(char *str, ...)
     va_list f;
     char buf[1024];
     va_start(f, str);
-    vsprintf(buf, str, f);
+    vsprintf_s(buf, 1024, str, f);
     if(RunningInBatchMode) {
         AttachConsoleDynamic(ATTACH_PARENT_PROCESS);
         HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -95,12 +95,12 @@ void Error(char *str, ...)
 
         // Indicate that it's an error, plus the output filename
         char str[MAX_PATH+100];
-        sprintf(str, "compile error ('%s'): ", CurrentCompileFile);
+        sprintf_s(str, MAX_PATH+100, "compile error ('%s'): ", CurrentCompileFile);
         WriteFile(h, str, strlen(str), &written, NULL);
         // The error message itself
         WriteFile(h, buf, strlen(buf), &written, NULL);
         // And an extra newline to be safe.
-        strcpy(str, "\n");
+        strcpy_s(str, MAX_PATH+100, "\n");
         WriteFile(h, str, strlen(str), &written, NULL);
     } else {
         HWND h = GetForegroundWindow();
@@ -116,7 +116,7 @@ void CompileSuccessfulMessage(char *str)
 {
     if(RunningInBatchMode) {
         char str[MAX_PATH+100];
-        sprintf(str, "compiled okay, wrote '%s'\n", CurrentCompileFile);
+        sprintf_s(str, MAX_PATH+100, "compiled okay, wrote '%s'\n", CurrentCompileFile);
 
         AttachConsoleDynamic(ATTACH_PARENT_PROCESS);
         HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -178,7 +178,7 @@ void CheckFree(void *p)
 //-----------------------------------------------------------------------------
 void StartIhex(FILE *f)
 {
-    fprintf(f, ":");
+    fprintf_s(f, ":");
     IhexChecksum = 0;
 }
 
@@ -188,7 +188,7 @@ void StartIhex(FILE *f)
 //-----------------------------------------------------------------------------
 void WriteIhex(FILE *f, BYTE b)
 {
-    fprintf(f, "%02X", b);
+    fprintf_s(f, "%02X", b);
     IhexChecksum += b;
 }
 
@@ -200,7 +200,7 @@ void FinishIhex(FILE *f)
 {
     IhexChecksum = ~IhexChecksum + 1;
     IhexChecksum = IhexChecksum & 0xff;
-    fprintf(f, "%02X\n", IhexChecksum);
+    fprintf_s(f, "%02X\n", IhexChecksum);
 }
 
 //-----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ void PinNumberForIo(char *dest, PlcProgramSingleIo *io)
     if(!dest) return;
 
     if(!io) {
-        strcpy(dest, "");
+        strcpy_s(dest, 1, "");
         return;
     }
         
@@ -356,29 +356,29 @@ void PinNumberForIo(char *dest, PlcProgramSingleIo *io)
     {
         int pin = io->pin;
         if(pin == NO_PIN_ASSIGNED) {
-            strcpy(dest, _("(not assigned)"));
+            strcpy_s(dest, MAX_NAME_LEN, _("(not assigned)"));
         } else {
-            sprintf(dest, "%d", pin);
+            sprintf_s(dest, MAX_NAME_LEN, "%d", pin);
         }
     } else if(type == IO_TYPE_UART_TX && Prog.mcu) {
         if(Prog.mcu->uartNeeds.txPin == 0) {
-            strcpy(dest, _("<no UART!>"));
+            strcpy_s(dest, MAX_NAME_LEN, _("<no UART!>"));
         } else {
-            sprintf(dest, "%d", Prog.mcu->uartNeeds.txPin);
+            sprintf_s(dest, MAX_NAME_LEN, "%d", Prog.mcu->uartNeeds.txPin);
         }
     } else if(type == IO_TYPE_UART_RX && Prog.mcu) {
         if(Prog.mcu->uartNeeds.rxPin == 0) {
-            strcpy(dest, _("<no UART!>"));
+            strcpy_s(dest, MAX_NAME_LEN, _("<no UART!>"));
         } else {
-            sprintf(dest, "%d", Prog.mcu->uartNeeds.rxPin);
+            sprintf_s(dest, MAX_NAME_LEN, "%d", Prog.mcu->uartNeeds.rxPin);
         }
     } else if(type == IO_TYPE_PWM_OUTPUT && Prog.mcu) {
         if(Prog.mcu->pwmNeedsPin == 0) {
-            strcpy(dest, _("<no PWM!>"));
+            strcpy_s(dest, MAX_NAME_LEN, _("<no PWM!>"));
         } else {
-            sprintf(dest, "%d", Prog.mcu->pwmNeedsPin);
+            sprintf_s(dest, MAX_NAME_LEN, "%d", Prog.mcu->pwmNeedsPin);
         }
     } else {
-        strcpy(dest, "");
+        strcpy_s(dest, 1, "");
     }
 }

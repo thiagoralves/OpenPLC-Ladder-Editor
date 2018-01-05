@@ -177,7 +177,7 @@ static void MakeControls(int a)
             // mutable.
             char copy[1024];
             if(strlen(s) >= sizeof(copy)) oops();
-            strcpy(copy, s);
+            strcpy_s(copy, 1024, s);
 
             int j;
             for(j = 1; copy[j]; j++) {

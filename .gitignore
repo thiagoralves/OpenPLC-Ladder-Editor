@@ -34,3 +34,12 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+# Binary files from compilation
+*.obj
+
+# debug files
+*/Debug
+*/.vs
+*.aps
+*.swp
